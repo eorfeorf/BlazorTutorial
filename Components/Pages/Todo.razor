@@ -1,0 +1,107 @@
+﻿
+@page "/todo"
+@rendermode InteractiveServer
+
+<h3>Todo (@_todos.Count(todo => !todo.IsDone))</h3>
+
+<input @bind="_newTodo" @oninput="SetInput" @onkeydown="KeyPress"/>
+<button @onclick="AddTodo">Add todo</button>
+
+<div style="display: flex; justify-self: space-between;">
+    <div style="min-width: 200px;">
+        <h4>未着手</h4>
+        <ul>
+            @foreach (var todo in _todos.Where(t => t.Status == Status.NotStarted))
+            {
+                <li>
+                    <input type="checkbox" @bind="todo.IsDone"/>
+                    <input @bind="todo.Title"/>
+                    <select @bind="todo.Status">
+                        @foreach (var status in Enum.GetValues(typeof(Status)))
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <button @onclick="() => RemoveTodo(todo)">✖</button>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div style="min-width: 200px;">
+        <h4>進行中</h4>
+        <ul>
+            @foreach (var todo in _todos.Where(t => t.Status == Status.InProgress))
+            {
+                <li>
+                    <input type="checkbox" @bind="todo.IsDone"/>
+                    <input @bind="todo.Title"/>
+                    <select @bind="todo.Status">
+                        @foreach (var status in Enum.GetValues(typeof(Status)))
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <button @onclick="() => RemoveTodo(todo)">✖</button>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div style="min-width: 200px;">
+        <h4>完了</h4>
+        <ul>
+            @foreach (var todo in _todos.Where(t => t.Status == Status.Completed))
+            {
+                <li>
+                    <input type="checkbox" @bind="todo.IsDone"/>
+                    <input @bind="todo.Title"/>
+                    <select @bind="todo.Status">
+                        @foreach (var status in Enum.GetValues(typeof(Status)))
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <button @onclick="() => RemoveTodo(todo)">✖</button>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+
+@code {
+    private readonly List<TodoItem> _todos = new();
+    string _newTodo = "";
+
+    void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(_newTodo))
+        {
+            _todos.Add(new TodoItem {Title = _newTodo});
+            _newTodo = string.Empty;
+        }
+    }
+
+    void SetInput(ChangeEventArgs? e)
+    {
+        if (e != null)
+        {
+            _newTodo = e.Value.ToString();
+        }
+    }
+
+    void KeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddTodo();
+        }
+    }
+
+    void RemoveTodo(TodoItem todo)
+    {
+        _todos.Remove(todo);
+    }
+
+}
